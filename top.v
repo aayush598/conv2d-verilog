@@ -20,10 +20,6 @@ module top #(
 
     parameter OUT_HEIGHT = (IN_HEIGHT + (2 * PADDING) - KERNEL_SIZE) / STRIDE + 1;
     parameter OUT_WIDTH  = (IN_WIDTH  + (2 * PADDING) - KERNEL_SIZE) / STRIDE + 1;
-    parameter TOTAL_WEIGHTS = OUT_CHANNELS * IN_CHANNELS * KERNEL_SIZE * KERNEL_SIZE;
-    parameter TOTAL_BIASES  = OUT_CHANNELS;
-    parameter TOTAL_OUTPUT_WIDTH = (TOTAL_WEIGHTS > TOTAL_BIASES ? TOTAL_WEIGHTS : TOTAL_BIASES) * DATA_WIDTH;
-
 
     integer b, out_ch, in_ch, out_h, out_w, k_h, k_w;
     integer input_h, input_w;
