@@ -49,6 +49,7 @@ module tb_top;
   reg [DATA_WIDTH-1:0] bias_tensor    [0:OUT_CHANNELS-1];
 
   integer i;
+  integer output_file;
 
   initial begin
     clk = 0;
@@ -80,10 +81,21 @@ module tb_top;
     // Wait for output to settle
     #500;
 
-    // Display output
-    for (i = 0; i < BATCH_SIZE*OUT_CHANNELS*OUT_HEIGHT*OUT_WIDTH; i = i + 1)
-      $display("Output[%0d] = %h", i, output_tensor_flat[i*DATA_WIDTH +: DATA_WIDTH]);
+    // Open output file for writing
+    output_file = $fopen("output_hex.txt", "w");
+    if (output_file == 0) begin
+      $display("❌ Error: Could not open output_hex.txt for writing");
+      $finish;
+    end
 
+    // Display & Write output
+    for (i = 0; i < BATCH_SIZE*OUT_CHANNELS*OUT_HEIGHT*OUT_WIDTH; i = i + 1) begin
+      $display("Output[%0d] = %h", i, output_tensor_flat[i*DATA_WIDTH +: DATA_WIDTH]);
+      $fdisplay(output_file, "%h", output_tensor_flat[i*DATA_WIDTH +: DATA_WIDTH]);
+    end
+
+    $fclose(output_file);
+    $display("✅ Output written to output_hex.txt");
     $finish;
   end
 
