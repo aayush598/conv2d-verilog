@@ -38,8 +38,8 @@ module top #(
     reg [DATA_WIDTH-1:0] output_tensor [0:BATCH_SIZE*OUT_CHANNELS*OUT_HEIGHT*OUT_WIDTH-1];
 
     initial begin
-        $readmemh("weights.txt", weights);
-        $readmemh("bias.txt", bias);
+        $readmemh("weights_hex.txt", weights);
+        $readmemh("bias_hex.txt", bias);
     end
     
     // Unpack input, weights, bias

@@ -325,6 +325,10 @@ def test_file_based_implementation():
     
     # Verilog-style implementation
     verilog_output = verilog_conv.forward_verilog_style(input_tensor)
+
+    print("*"*50)
+    print(f"verilog_output : {verilog_output}")
+    print("*"*50)
     
     # PyTorch implementation
     with torch.no_grad():
