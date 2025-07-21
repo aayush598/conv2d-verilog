@@ -4,13 +4,13 @@ module tb_top;
 
   parameter DATA_WIDTH   = 32;
   parameter BATCH_SIZE   = 1;
-  parameter IN_CHANNELS  = 3;
-  parameter IN_HEIGHT    = 8;
-  parameter IN_WIDTH     = 8;
-  parameter OUT_CHANNELS = 4;
+  parameter IN_CHANNELS  = 1;
+  parameter IN_HEIGHT    = 4;
+  parameter IN_WIDTH     = 4;
+  parameter OUT_CHANNELS = 1;
   parameter KERNEL_SIZE  = 3;
   parameter STRIDE       = 1;
-  parameter PADDING      = 1;
+  parameter PADDING      = 0;
   parameter OUT_HEIGHT   = (IN_HEIGHT + 2*PADDING - KERNEL_SIZE) / STRIDE + 1;
   parameter OUT_WIDTH    = (IN_WIDTH + 2*PADDING - KERNEL_SIZE) / STRIDE + 1;
 
