@@ -1,16 +1,16 @@
-`timescale 1ns/1ps
+`timescale 1ns / 1ps
 
-module tb_top;
+module tb_conv1;
 
   parameter DATA_WIDTH   = 32;
   parameter BATCH_SIZE   = 1;
-  parameter IN_CHANNELS  = 1;
-  parameter IN_HEIGHT    = 4;
-  parameter IN_WIDTH     = 4;
-  parameter OUT_CHANNELS = 1;
-  parameter KERNEL_SIZE  = 3;
+  parameter IN_CHANNELS  = 8;
+  parameter IN_HEIGHT    = 7;
+  parameter IN_WIDTH     = 7;
+  parameter OUT_CHANNELS = 32;
+  parameter KERNEL_SIZE  = 7;
   parameter STRIDE       = 1;
-  parameter PADDING      = 0;
+  parameter PADDING      = 3;
   parameter OUT_HEIGHT   = (IN_HEIGHT + 2*PADDING - KERNEL_SIZE) / STRIDE + 1;
   parameter OUT_WIDTH    = (IN_WIDTH + 2*PADDING - KERNEL_SIZE) / STRIDE + 1;
 
@@ -20,7 +20,7 @@ module tb_top;
   reg [OUT_CHANNELS*DATA_WIDTH-1:0] bias_flat;
   wire [BATCH_SIZE*OUT_CHANNELS*OUT_HEIGHT*OUT_WIDTH*DATA_WIDTH-1:0] output_tensor_flat;
 
-  // Instantiate the DUT
+  // Instantiate DUT
   top #(
     .BATCH_SIZE(BATCH_SIZE),
     .IN_CHANNELS(IN_CHANNELS),
@@ -43,7 +43,7 @@ module tb_top;
   // Clock generation
   always #5 clk = ~clk;
 
-  // Memory for loading hex files
+  // Memory arrays
   reg [DATA_WIDTH-1:0] input_tensor   [0:BATCH_SIZE*IN_CHANNELS*IN_HEIGHT*IN_WIDTH-1];
   reg [DATA_WIDTH-1:0] weights_tensor [0:OUT_CHANNELS*IN_CHANNELS*KERNEL_SIZE*KERNEL_SIZE-1];
   reg [DATA_WIDTH-1:0] bias_tensor    [0:OUT_CHANNELS-1];
@@ -58,44 +58,44 @@ module tb_top;
     weights_flat = 0;
     bias_flat = 0;
 
-    // Load values from hex files (created by Python script)
+    $display("🚀 Simulation started");
+
+    // Load values
+    $display("📥 Loading input...");
     $readmemh("input_hex.txt", input_tensor);
+    $display("📥 Loading weights...");
     $readmemh("weights_hex.txt", weights_tensor);
+    $display("📥 Loading bias...");
     $readmemh("bias_hex.txt", bias_tensor);
 
-    // Flatten input tensor
+    $display("🔃 Flattening input tensor...");
     for (i = 0; i < BATCH_SIZE*IN_CHANNELS*IN_HEIGHT*IN_WIDTH; i = i + 1)
       input_tensor_flat[i*DATA_WIDTH +: DATA_WIDTH] = input_tensor[i];
 
-    // Flatten weights
+    $display("🔃 Flattening weights tensor...");
     for (i = 0; i < OUT_CHANNELS*IN_CHANNELS*KERNEL_SIZE*KERNEL_SIZE; i = i + 1)
       weights_flat[i*DATA_WIDTH +: DATA_WIDTH] = weights_tensor[i];
 
-    // Flatten bias
+    $display("🔃 Flattening bias tensor...");
     for (i = 0; i < OUT_CHANNELS; i = i + 1)
       bias_flat[i*DATA_WIDTH +: DATA_WIDTH] = bias_tensor[i];
 
-    // Deassert reset after 20ns
+    $display("🛑 Deasserting reset in 20ns...");
     #20 rst = 0;
+    $display("▶️  Running simulation...");
 
-    // Wait for output to settle
-    #500;
+    #2000;
 
-    // Open output file for writing
+    $display("💾 Writing output to output_hex.txt...");
     output_file = $fopen("output_hex.txt", "w");
-    if (output_file == 0) begin
-      $display("❌ Error: Could not open output_hex.txt for writing");
-      $finish;
-    end
 
-    // Display & Write output
     for (i = 0; i < BATCH_SIZE*OUT_CHANNELS*OUT_HEIGHT*OUT_WIDTH; i = i + 1) begin
       $display("Output[%0d] = %h", i, output_tensor_flat[i*DATA_WIDTH +: DATA_WIDTH]);
       $fdisplay(output_file, "%h", output_tensor_flat[i*DATA_WIDTH +: DATA_WIDTH]);
     end
 
     $fclose(output_file);
-    $display("✅ Output written to output_hex.txt");
+    $display("✅ Simulation completed, output saved.");
     $finish;
   end
 
